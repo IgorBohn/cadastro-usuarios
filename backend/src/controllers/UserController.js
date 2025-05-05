@@ -1,13 +1,22 @@
 const { User } = require("../models");
 
 class UserController {
+  isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
   async createUser(req, res) {
     const { name, email } = req.body;
 
-    if (!name || !email) {
+    if (!name?.trim() || !email?.trim()) {
       return res
-        .status(400)
-        .json({ message: "Os campos nome e email são obrigatórios." });
+        .status(422)
+        .json({ message: "Nome e email são obrigatórios." });
+    }
+
+    if (!this.isValidEmail(email)) {
+      return res.status(422).json({ message: "Email inválido." });
     }
 
     try {
@@ -15,15 +24,19 @@ class UserController {
 
       if (existingUser) {
         return res
-          .status(400)
+          .status(409)
           .json({ message: "Usuário já cadastrado com esse email." });
       }
 
-      const newUser = await User.create({ name, email });
-
+      const newUser = await User.create({
+        name: name.trim(),
+        email: email.trim(),
+      });
       return res.status(201).json(newUser);
     } catch (err) {
-      return res.status(500).json({ message: "Erro ao criar o usuário." });
+      return res
+        .status(500)
+        .json({ message: "Erro interno ao criar o usuário." });
     }
   }
 
@@ -37,7 +50,11 @@ class UserController {
   }
 
   async getUserById(req, res) {
-    const userId = req.params.id;
+    const userId = parseInt(req.params.id, 10);
+
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: "ID inválido." });
+    }
 
     try {
       const user = await User.findByPk(userId);
@@ -53,12 +70,29 @@ class UserController {
   }
 
   async modifyUser(req, res) {
-    const userId = req.params.id;
+    const userId = parseInt(req.params.id, 10);
     const { name, email } = req.body;
+
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: "ID inválido." });
+    }
+
+    if (!name?.trim() && !email?.trim()) {
+      return res.status(422).json({
+        message: "Informe pelo menos nome ou email para atualização.",
+      });
+    }
+
+    if (email && !this.isValidEmail(email)) {
+      return res.status(422).json({ message: "Email inválido." });
+    }
 
     try {
       const updatedRows = await User.update(
-        { name, email },
+        {
+          ...(name && { name: name.trim() }),
+          ...(email && { email: email.trim() }),
+        },
         { where: { id: userId } }
       );
 
@@ -70,14 +104,18 @@ class UserController {
 
       return res
         .status(200)
-        .json({ message: "Dados do usuário atualizados com sucesso." });
+        .json({ message: "Usuário atualizado com sucesso." });
     } catch (err) {
       return res.status(500).json({ message: "Erro ao atualizar o usuário." });
     }
   }
 
   async removeUser(req, res) {
-    const userId = req.params.id;
+    const userId = parseInt(req.params.id, 10);
+
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: "ID inválido." });
+    }
 
     try {
       const deleted = await User.destroy({ where: { id: userId } });
