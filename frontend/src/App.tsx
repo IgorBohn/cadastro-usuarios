@@ -1,13 +1,13 @@
 import React from "react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import darkTheme from "./theme";
-import { UserManager } from "./components/UserManager";
+import { UserPage } from "./pages/UserPage";
 
 function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <UserManager />
+      <UserPage />
     </ThemeProvider>
   );
 }

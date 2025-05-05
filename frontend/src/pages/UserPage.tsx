@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { UserTable } from "../components/UserTable";
 import {
   getUsers,
   createUser,
@@ -8,11 +9,6 @@ import {
 } from "../services/userService";
 import {
   Container,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
   Button,
   TextField,
   Box,
@@ -20,14 +16,9 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
+import type { User } from "../types/user";
 
-type User = {
-  id?: string;
-  name: string;
-  email: string;
-};
-
-export const UserManager: React.FC = () => {
+export const UserPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [formUser, setFormUser] = useState<User>({ name: "", email: "" });
   const [isEditing, setIsEditing] = useState(false);
@@ -122,42 +113,7 @@ export const UserManager: React.FC = () => {
           Lista de Usuários
         </Typography>
         <Divider sx={{ mb: 2 }} />
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Nome</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Ações</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => handleEdit(user.id!)}
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      color="error"
-                      onClick={() => handleDelete(user.id!)}
-                    >
-                      Excluir
-                    </Button>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <UserTable users={users} onEdit={handleEdit} onDelete={handleDelete} />
       </Paper>
     </Container>
   );
