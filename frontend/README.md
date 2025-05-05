@@ -3,14 +3,14 @@
 
 Este é o frontend da aplicação de cadastro de usuários, desenvolvido com React, TypeScript e Material UI.
 
-## 🛠 Tecnologias
+## Tecnologias
 
 - React
 - TypeScript
 - Material UI
 - Axios
 
-## ⚙️ Instalação
+## Instalação
 
 1. Instale as dependências:
 ```bash
