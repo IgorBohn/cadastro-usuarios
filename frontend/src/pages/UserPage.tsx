@@ -19,12 +19,27 @@ import {
 import type { User } from "../types/user";
 import { AlertDialog } from "../components/AlertDialog";
 
+type AlertState = {
+  open: boolean;
+  title: string;
+  description: string;
+  type: "success" | "error" | "info" | "warning";
+  onConfirm?: () => void;
+  confirmText?: string;
+  cancelText?: string;
+};
+
 export const UserPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [formUser, setFormUser] = useState<User>({ name: "", email: "" });
   const [isEditing, setIsEditing] = useState(false);
-  const [openConfirm, setOpenConfirm] = useState(false);
-  const [userIdToDelete, setUserIdToDelete] = useState<string | null>(null);
+
+  const [alert, setAlert] = useState<AlertState>({
+    open: false,
+    title: "",
+    description: "",
+    type: "info",
+  });
 
   const loadUsers = async () => {
     const res = await getUsers();
@@ -40,13 +55,34 @@ export const UserPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (isEditing && formUser.id) {
-      await updateUser(formUser.id, formUser);
-    } else {
-      await createUser(formUser);
+    try {
+      if (isEditing && formUser.id) {
+        await updateUser(formUser.id, formUser);
+        setAlert({
+          open: true,
+          title: "Usuário Atualizado",
+          description: "O usuário foi atualizado com sucesso.",
+          type: "success",
+        });
+      } else {
+        await createUser(formUser);
+        setAlert({
+          open: true,
+          title: "Usuário Criado",
+          description: "O usuário foi criado com sucesso.",
+          type: "success",
+        });
+      }
+      resetForm();
+      loadUsers();
+    } catch (error) {
+      setAlert({
+        open: true,
+        title: "Erro",
+        description: "Ocorreu um erro ao salvar o usuário.",
+        type: "error",
+      });
     }
-    resetForm();
-    loadUsers();
   };
 
   const handleEdit = async (id: string) => {
@@ -56,22 +92,44 @@ export const UserPage: React.FC = () => {
   };
 
   const confirmDelete = (id: string) => {
-    setUserIdToDelete(id);
-    setOpenConfirm(true);
+    setAlert({
+      open: true,
+      title: "Confirmar Exclusão",
+      description:
+        "Tem certeza que deseja excluir este usuário? Essa ação não poderá ser desfeita.",
+      type: "warning",
+      confirmText: "Excluir",
+      cancelText: "Cancelar",
+      onConfirm: () => handleConfirmDelete(id),
+    });
   };
 
-  const handleConfirmDelete = async () => {
-    if (userIdToDelete) {
-      await deleteUser(userIdToDelete);
+  const handleConfirmDelete = async (id: string) => {
+    try {
+      await deleteUser(id);
       loadUsers();
-      setUserIdToDelete(null);
-      setOpenConfirm(false);
+      setAlert({
+        open: true,
+        title: "Usuário Excluído",
+        description: "O usuário foi excluído com sucesso.",
+        type: "success",
+      });
+    } catch (error) {
+      setAlert({
+        open: true,
+        title: "Erro",
+        description: "Ocorreu um erro ao excluir o usuário.",
+        type: "error",
+      });
     }
   };
-
   const resetForm = () => {
     setFormUser({ name: "", email: "" });
     setIsEditing(false);
+  };
+
+  const handleAlertClose = () => {
+    setAlert((prev) => ({ ...prev, open: false }));
   };
 
   return (
@@ -129,14 +187,21 @@ export const UserPage: React.FC = () => {
       </Paper>
 
       <AlertDialog
-        open={openConfirm}
-        title="Confirmar Exclusão"
-        description="Tem certeza que deseja excluir este usuário? Essa ação não poderá ser desfeita."
-        type="warning"
-        confirmText="Excluir"
-        cancelText="Cancelar"
-        onClose={() => setOpenConfirm(false)}
-        onConfirm={handleConfirmDelete}
+        open={alert.open}
+        title={alert.title}
+        description={alert.description}
+        type={alert.type}
+        confirmText={alert.confirmText}
+        cancelText={alert.cancelText}
+        onClose={handleAlertClose}
+        onConfirm={
+          alert.onConfirm
+            ? () => {
+                alert.onConfirm?.();
+                handleAlertClose();
+              }
+            : undefined
+        }
       />
     </Container>
   );
