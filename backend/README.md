@@ -34,3 +34,5 @@ yarn test
 # ou
 npm test
 ```
+### Variáveis de Ambiente
+Este projeto usa variáveis de ambiente. Renomeie .env.example para .env e configure conforme seu ambiente local.
