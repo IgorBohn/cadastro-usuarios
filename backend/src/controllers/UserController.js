@@ -1,11 +1,11 @@
 const { User } = require("../models");
 
-class UserController {
-  isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
 
+class UserController {
   async createUser(req, res) {
     const { name, email } = req.body;
 
@@ -15,7 +15,7 @@ class UserController {
         .json({ message: "Nome e email são obrigatórios." });
     }
 
-    if (!this.isValidEmail(email)) {
+    if (!isValidEmail(email)) {
       return res.status(422).json({ message: "Email inválido." });
     }
 
@@ -83,7 +83,7 @@ class UserController {
       });
     }
 
-    if (email && !this.isValidEmail(email)) {
+    if (email && !isValidEmail(email)) {
       return res.status(422).json({ message: "Email inválido." });
     }
 
