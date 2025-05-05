@@ -18,18 +18,18 @@ yarn install
 # ou
 npm install
 ```
-```
+```bash
 npx sequelize-cli db:create
 ```
-```
+```bash
 npx sequelize-cli db:migrate
 ```
-```
+```bash
 yarn dev
 # ou
 npm run dev
 ```
-```
+```bash
 yarn test
 # ou
 npm test
