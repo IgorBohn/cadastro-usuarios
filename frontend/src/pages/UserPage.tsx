@@ -17,11 +17,14 @@ import {
   Divider,
 } from "@mui/material";
 import type { User } from "../types/user";
+import { AlertDialog } from "../components/AlertDialog";
 
 export const UserPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [formUser, setFormUser] = useState<User>({ name: "", email: "" });
   const [isEditing, setIsEditing] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState<string | null>(null);
 
   const loadUsers = async () => {
     const res = await getUsers();
@@ -52,9 +55,18 @@ export const UserPage: React.FC = () => {
     setIsEditing(true);
   };
 
-  const handleDelete = async (id: string) => {
-    await deleteUser(id);
-    loadUsers();
+  const confirmDelete = (id: string) => {
+    setUserIdToDelete(id);
+    setOpenConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (userIdToDelete) {
+      await deleteUser(userIdToDelete);
+      loadUsers();
+      setUserIdToDelete(null);
+      setOpenConfirm(false);
+    }
   };
 
   const resetForm = () => {
@@ -113,8 +125,19 @@ export const UserPage: React.FC = () => {
           Lista de Usuários
         </Typography>
         <Divider sx={{ mb: 2 }} />
-        <UserTable users={users} onEdit={handleEdit} onDelete={handleDelete} />
+        <UserTable users={users} onEdit={handleEdit} onDelete={confirmDelete} />
       </Paper>
+
+      <AlertDialog
+        open={openConfirm}
+        title="Confirmar Exclusão"
+        description="Tem certeza que deseja excluir este usuário? Essa ação não poderá ser desfeita."
+        type="warning"
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        onClose={() => setOpenConfirm(false)}
+        onConfirm={handleConfirmDelete}
+      />
     </Container>
   );
 };
