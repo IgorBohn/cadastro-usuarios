@@ -63,6 +63,7 @@ export const UserPage: React.FC = () => {
           title: "Usuário Atualizado",
           description: "O usuário foi atualizado com sucesso.",
           type: "success",
+          cancelText: "Ok",
         });
       } else {
         await createUser(formUser);
@@ -71,6 +72,7 @@ export const UserPage: React.FC = () => {
           title: "Usuário Criado",
           description: "O usuário foi criado com sucesso.",
           type: "success",
+          cancelText: "Ok",
         });
       }
       resetForm();
@@ -113,6 +115,7 @@ export const UserPage: React.FC = () => {
         title: "Usuário Excluído",
         description: "O usuário foi excluído com sucesso.",
         type: "success",
+        cancelText: "Ok",
       });
     } catch (error) {
       setAlert({
