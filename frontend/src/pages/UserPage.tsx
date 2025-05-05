@@ -171,7 +171,11 @@ export const UserPage: React.FC = () => {
             fullWidth
           />
           <Box sx={{ display: "flex", gap: 2 }}>
-            <Button variant="contained" onClick={handleSubmit}>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={!formUser.name.trim() || !formUser.email.trim()}
+            >
               {isEditing ? "Atualizar" : "Criar"}
             </Button>
             <Button variant="outlined" color="secondary" onClick={resetForm}>
