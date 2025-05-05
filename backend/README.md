@@ -2,7 +2,7 @@
 
 Este é o backend da aplicação de cadastro de usuários, desenvolvido com Node.js, Express e Sequelize.
 
-## 📦 Tecnologias
+## Tecnologias
 
 - Node.js
 - Express
@@ -10,7 +10,7 @@ Este é o backend da aplicação de cadastro de usuários, desenvolvido com Node
 - PostgreSQL
 - Jest (para testes)
 
-## ⚙️ Instalação
+## Instalação
 
 1. Instale as dependências:
 ```bash
