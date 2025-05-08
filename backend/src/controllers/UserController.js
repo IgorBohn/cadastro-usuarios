@@ -1,4 +1,5 @@
 const { User } = require("../models");
+const { Op } = require("sequelize");
 
 function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,8 +42,19 @@ class UserController {
   }
 
   async listUsers(req, res) {
+    const { search } = req.query;
+
+    const whereConditions = {};
+
+    if (search) {
+      whereConditions[Op.or] = [
+        { name: { [Op.iLike]: `%${search}%` } },
+        { email: { [Op.iLike]: `%${search}%` } },
+      ];
+    }
+
     try {
-      const allUsers = await User.findAll();
+      const allUsers = await User.findAll({ where: whereConditions });
       return res.status(200).json(allUsers);
     } catch (err) {
       return res.status(500).json({ message: "Erro ao buscar usuários." });

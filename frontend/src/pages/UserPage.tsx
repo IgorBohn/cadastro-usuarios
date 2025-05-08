@@ -33,6 +33,7 @@ export const UserPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [formUser, setFormUser] = useState<User>({ name: "", email: "" });
   const [isEditing, setIsEditing] = useState(false);
+  const [search, setSearch] = useState("");
 
   const [alert, setAlert] = useState<AlertState>({
     open: false,
@@ -41,14 +42,18 @@ export const UserPage: React.FC = () => {
     type: "info",
   });
 
-  const loadUsers = async () => {
-    const res = await getUsers();
+  const loadUsers = async (search: string) => {
+    const res = await getUsers(search);
     setUsers(res.data);
   };
 
   useEffect(() => {
-    loadUsers();
-  }, []);
+    loadUsers(search);
+  }, [search]);
+
+  const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormUser({ ...formUser, [e.target.name]: e.target.value });
@@ -76,7 +81,7 @@ export const UserPage: React.FC = () => {
         });
       }
       resetForm();
-      loadUsers();
+      loadUsers(search);
     } catch (error) {
       setAlert({
         open: true,
@@ -109,7 +114,7 @@ export const UserPage: React.FC = () => {
   const handleConfirmDelete = async (id: string) => {
     try {
       await deleteUser(id);
-      loadUsers();
+      loadUsers(search);
       setAlert({
         open: true,
         title: "Usuário Excluído",
@@ -183,6 +188,15 @@ export const UserPage: React.FC = () => {
             </Button>
           </Box>
         </Box>
+      </Paper>
+      {}
+      <Paper elevation={2} sx={{ p: 2, mb: 2 }}>
+        <TextField
+          label="Buscar Usuário"
+          value={search}
+          onChange={handleChangeSearch}
+          fullWidth
+        />
       </Paper>
 
       <Paper elevation={2} sx={{ p: 2 }}>
